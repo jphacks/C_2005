@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import './src/pages/index.dart';
+import 'package:ichimai/src/screens/wrapper.dart';
 
 void main() => runApp(MyApp());
 
@@ -13,7 +12,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: IndexPage(),
+      home: Wrapper(),
     );
   }
 }
