@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:ichimai/src/screens/pages/call.dart';
 import 'package:ichimai/src/services/auth.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 class Menu extends StatelessWidget {
@@ -15,11 +17,28 @@ class Menu extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            MenuTile(
-              title: 'Menu 1',
+            ListTile(
+              title: Text('Generate Token'),
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (BuildContext context) {
+                  return Scaffold(
+                    appBar: AppBar(
+                      title: Text('Generate token'),
+                    ),
+                    body: Container(),
+                  );
+                }));
+              },
             ),
-            MenuTile(
-              title: 'Menu 2',
+            ListTile(
+              title: Text('Connect'),
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (BuildContext context) {
+                  return CallPage();
+                }));
+              },
             ),
             MenuTile(
               title: 'Menu 3',

@@ -23,29 +23,31 @@ class _RegisterState extends State<Register> {
       ),
       body: SafeArea(
           child: Form(
+              key: _formKey,
               child: Column(
-        children: [
-          sizedbox,
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextFormField(
-              decoration: textInputDecoration.copyWith(hintText: 'Name'),
-              onChanged: (val) {
-                setState(() => name = val);
-              },
-            ),
-          ),
-          sizedbox,
-          RaisedButton(
-            child: Text('Sign In'),
-            onPressed: () {
-              if (/*_formKey.currentState.validate()*/ true) {
-                service.signIn('1234', name);
-              }
-            },
-          )
-        ],
-      ))),
+                children: [
+                  sizedbox,
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: TextFormField(
+                      decoration:
+                          textInputDecoration.copyWith(hintText: 'Name'),
+                      onChanged: (val) {
+                        setState(() => name = val);
+                      },
+                    ),
+                  ),
+                  sizedbox,
+                  RaisedButton(
+                    child: Text('Sign In'),
+                    onPressed: () {
+                      if (/*_formKey.currentState.validate()*/ true) {
+                        service.signIn('1234', name);
+                      }
+                    },
+                  )
+                ],
+              ))),
     );
   }
 }
