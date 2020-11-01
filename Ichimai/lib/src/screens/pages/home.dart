@@ -6,7 +6,9 @@ import 'package:ichimai/src/services/auth.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 
-class Menu extends StatelessWidget {
+class Home extends StatelessWidget {
+  final AuthService _auth = AuthService();
+
   Future<String> getToken() async {
     final response = await http.get(
         'http://oram.kr/jphacks/getToken/RtcTokenBuilderSample.php?channelName=asdf&uid=-1744234330');
@@ -19,13 +21,8 @@ class Menu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var service = Provider.of<AuthService>(context);
     return Scaffold(
-      appBar: AppBar(
-        title: Consumer<AuthService>(builder: (context, service, child) {
-          return Text('Menu - ' + service.user.name);
-        }),
-      ),
+      appBar: AppBar(title: Text('Menu - ')),
       body: SafeArea(
         child: Column(
           children: [
@@ -62,8 +59,8 @@ class Menu extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.logout),
-        onPressed: () {
-          service.signOut();
+        onPressed: () async {
+          await _auth.signOut();
         },
       ),
     );
