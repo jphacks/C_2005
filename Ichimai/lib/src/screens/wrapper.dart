@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ichimai/src/models/user.dart';
-import 'package:ichimai/src/screens/authenticate/register.dart';
-import 'package:ichimai/src/screens/pages/menu.dart';
-import 'package:ichimai/src/services/auth.dart';
+import 'package:ichimai/src/screens/authenticate/authenticate.dart';
+import 'package:ichimai/src/screens/pages/home.dart';
 import 'package:provider/provider.dart';
 
 class Wrapper extends StatefulWidget {
@@ -13,14 +12,14 @@ class Wrapper extends StatefulWidget {
 class _WrapperState extends State<Wrapper> {
   @override
   Widget build(BuildContext context) {
-    return Consumer<AuthService>(
-      builder: (BuildContext context, AuthService service, Widget child) {
-        if (service.user == null) {
-          return Register();
-        } else {
-          return Menu();
-        }
-      },
-    );
+    // StreamProvider.value로 받은 value(User타입)를 사용
+    final user = Provider.of<UserData>(context);
+
+    // return either Home or Authenticate Widget
+    if (user == null) {
+      return Authenticate();
+    } else {
+      return Home();
+    }
   }
 }

@@ -3,21 +3,22 @@ import 'package:ichimai/src/services/auth.dart';
 import 'package:ichimai/src/shared/loading.dart';
 import 'package:ichimai/src/shared/theme.dart';
 
-class Register extends StatefulWidget {
-  final Function toggleView;
+class SignIn extends StatefulWidget {
+  final Function toggleView; //Register/SignIn 교환 토글
 
-  const Register({Key key, this.toggleView}) : super(key: key);
+  const SignIn({Key key, this.toggleView}) : super(key: key);
 
   @override
-  _RegisterState createState() => _RegisterState();
+  _SignInState createState() => _SignInState();
 }
 
-class _RegisterState extends State<Register> {
+class _SignInState extends State<SignIn> {
   final AuthService _auth = AuthService();
   final _formKey = GlobalKey<FormState>();
 
   bool loading = false;
 
+  // text field state
   String email = '';
   String password = '';
   String error = '';
@@ -31,14 +32,14 @@ class _RegisterState extends State<Register> {
             appBar: AppBar(
               backgroundColor: Colors.brown[400],
               elevation: 0.0,
-              title: Text('Sign up to Ichimai'),
+              title: Text('Sign in to Ichimai'),
               actions: [
                 FlatButton.icon(
                   onPressed: () {
                     widget.toggleView();
                   },
                   icon: Icon(Icons.person),
-                  label: Text('Sign In'),
+                  label: Text('Register'),
                 )
               ],
             ),
@@ -72,18 +73,20 @@ class _RegisterState extends State<Register> {
                       // 로그인 버튼
                       color: Colors.pink[400],
                       child: Text(
-                        'Register',
+                        'Sign in',
                         style: TextStyle(color: Colors.white),
                       ),
                       onPressed: () async {
-                        //
                         if (_formKey.currentState.validate()) {
+                          print('signin');
                           setState(() => loading = true);
                           dynamic result = await _auth
-                              .registerWithEmailAndPassword(email, password);
+                              .signInWithEmailAndPassword(email, password);
+                          print(result);
                           if (result == null) {
                             setState(() {
-                              error = 'please supply a valid email';
+                              error =
+                                  'could not sign in with those credentials';
                               loading = false;
                             });
                           }
