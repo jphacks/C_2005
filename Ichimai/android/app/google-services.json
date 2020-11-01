@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "552104296338",
+    "firebase_url": "https://ichimai.firebaseio.com",
+    "project_id": "ichimai",
+    "storage_bucket": "ichimai.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:552104296338:android:00eec6e87ffb0e26cc8b4b",
+        "android_client_info": {
+          "package_name": "net.harusari.ichimai"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "552104296338-tfjngo1hrg3ca982dhdh24f02gp00a6k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDLGXRlce8ezCALoH1HcgqiigFiCyIgAx0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "552104296338-tfjngo1hrg3ca982dhdh24f02gp00a6k.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

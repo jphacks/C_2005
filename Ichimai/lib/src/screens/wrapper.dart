@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:ichimai/src/models/user.dart';
 import 'package:ichimai/src/screens/authenticate/register.dart';
-import 'package:ichimai/src/screens/pages/menu.dart';
+import 'package:ichimai/src/screens/pages/home.dart';
 import 'package:ichimai/src/services/auth.dart';
 import 'package:provider/provider.dart';
 

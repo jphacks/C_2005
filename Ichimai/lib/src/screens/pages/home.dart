@@ -1,10 +1,22 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:ichimai/src/screens/pages/call.dart';
 import 'package:ichimai/src/services/auth.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
 
 class Menu extends StatelessWidget {
+  Future<String> getToken() async {
+    final response = await http.get(
+        'http://oram.kr/jphacks/getToken/RtcTokenBuilderSample.php?channelName=asdf&uid=-1744234330');
+    if (response.statusCode == 200) {
+      return response.body;
+    } else {
+      throw Exception('Failed to load post');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     var service = Provider.of<AuthService>(context);
@@ -40,9 +52,11 @@ class Menu extends StatelessWidget {
                 }));
               },
             ),
-            MenuTile(
-              title: 'Menu 3',
-            ),
+            ListTile(
+                title: Text('Menu 3'),
+                onTap: () async {
+                  await getToken().then((value) => print(value));
+                }),
           ],
         ),
       ),
@@ -52,20 +66,6 @@ class Menu extends StatelessWidget {
           service.signOut();
         },
       ),
-    );
-  }
-}
-
-class MenuTile extends StatelessWidget {
-  final String title;
-
-  const MenuTile({Key key, this.title}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(title),
-      onTap: () {},
     );
   }
 }
