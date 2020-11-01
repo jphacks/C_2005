@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:ichimai/src/models/user.dart';
 import 'package:ichimai/src/screens/wrapper.dart';
+import 'package:ichimai/src/services/auth.dart';
+import 'package:ichimai/src/models/user.dart';
+import 'package:provider/provider.dart';
 
 void main() => runApp(MyApp());
 
@@ -12,7 +16,10 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: Wrapper(),
+      home: ChangeNotifierProvider(
+        create: (BuildContext context) => AuthService(),
+        child: Wrapper(),
+      ),
     );
   }
 }
