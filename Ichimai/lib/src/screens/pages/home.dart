@@ -1,58 +1,80 @@
 import 'dart:async';
 
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:ichimai/src/models/user.dart';
 import 'package:ichimai/src/screens/pages/call.dart';
+import 'package:ichimai/src/screens/pages/search.dart';
 import 'package:ichimai/src/services/auth.dart';
+import 'package:ichimai/src/services/connect.dart';
 import 'package:provider/provider.dart';
-import 'package:http/http.dart' as http;
 
 class Home extends StatelessWidget {
   final AuthService _auth = AuthService();
 
-  Future<String> getToken() async {
-    final response = await http.get(
-        'http://oram.kr/jphacks/getToken/RtcTokenBuilderSample.php?channelName=asdf&uid=-1744234330');
-    if (response.statusCode == 200) {
-      return response.body;
-    } else {
-      throw Exception('Failed to load post');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserData>(context);
+    final referenceDatase = FirebaseDatabase.instance;
+
     return Scaffold(
-      appBar: AppBar(title: Text('Menu - ')),
+      appBar: AppBar(title: Text('Home')),
       body: SafeArea(
         child: Column(
           children: [
             ListTile(
-              title: Text('Generate Token'),
-              onTap: () {
+              title: Text('Search'),
+              onTap: () async {
+                // * GPS 좌표 설정
+                await Geolocator.getCurrentPosition(
+                        desiredAccuracy: LocationAccuracy.high)
+                    .then((position) {
+                  referenceDatase
+                      .reference()
+                      .child('Users')
+                      .child(user.generateAgoraUid().toString())
+                      .child('la')
+                      .set(position.latitude);
+                  referenceDatase
+                      .reference()
+                      .child('Users')
+                      .child(user.generateAgoraUid().toString())
+                      .child('lo')
+                      .set(position.longitude);
+                });
                 Navigator.push(context,
                     MaterialPageRoute(builder: (BuildContext context) {
-                  return Scaffold(
-                    appBar: AppBar(
-                      title: Text('Generate token'),
-                    ),
-                    body: Container(),
-                  );
+                  return Search();
                 }));
               },
             ),
             ListTile(
               title: Text('Connect'),
-              onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (BuildContext context) {
-                  return CallPage();
-                }));
+              onTap: () async {
+                String channel = 'test3';
+                await ConnectionService().getToken(user, channel).then((value) {
+                  // print('channel "$channel"');
+                  // print('a token is generated. ');
+                  // print(value);
+                  // print('uid: ${user.generateAgoraUid()}');
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (BuildContext context) {
+                    return CallPage(
+                      token: value,
+                      channel: channel,
+                      uid: user.generateAgoraUid(),
+                    );
+                  }));
+                });
               },
             ),
             ListTile(
                 title: Text('Menu 3'),
                 onTap: () async {
-                  await getToken().then((value) => print(value));
+                  Position position = await Geolocator.getCurrentPosition(
+                      desiredAccuracy: LocationAccuracy.high);
+                  print(position);
                 }),
           ],
         ),

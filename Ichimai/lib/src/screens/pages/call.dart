@@ -1,3 +1,4 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -5,13 +6,24 @@ import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:ichimai/src/shared/settings.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+//* 토큰, 채널을 인수로 입력받음
+//* 연결동작과 통화중 페이지를 표시
+//*
+
 class CallPage extends StatefulWidget {
+  final String token, channel;
+  final int uid;
+
+  const CallPage({Key key, this.token, this.channel, this.uid})
+      : super(key: key);
+
   @override
   _CallPageState createState() => _CallPageState();
 }
 
 class _CallPageState extends State<CallPage> {
-  final _users = <int>[];
+  final referenceDatase = FirebaseDatabase.instance;
+
   final _infoStrings = <String>[];
   bool muted = false;
   RtcEngine _engine;
@@ -26,9 +38,16 @@ class _CallPageState extends State<CallPage> {
 
   @override
   void dispose() {
+    //* 데이터베이스에 채널 제거
+    final ref =
+        referenceDatase.reference().child('Channels').child(widget.channel);
+
+    ref.remove();
+
     // clear users
-    _users.clear();
+
     // destroy sdk
+    _engine.disableAudio();
     _engine.leaveChannel();
     _engine.destroy();
     super.dispose();
@@ -38,6 +57,7 @@ class _CallPageState extends State<CallPage> {
     await PermissionHandler().requestPermissions(
       [PermissionGroup.microphone],
     );
+
     if (APP_ID.isEmpty) {
       setState(() {
         _infoStrings.add(
@@ -52,7 +72,22 @@ class _CallPageState extends State<CallPage> {
 
     _addAgoraEventHandlers();
     await _engine.enableAudioVolumeIndication(500, 3, true);
-    await _engine.joinChannel(Token, 'test', null, 0);
+    await _engine.joinChannel(widget.token, widget.channel, null, widget.uid);
+    // * 데이터베이스에 채널 추가
+    final ref =
+        referenceDatase.reference().child('Channels').child(widget.channel);
+    ref.child('token').set(widget.token).asStream();
+    ref.child('starting at').set(DateTime.now().millisecondsSinceEpoch);
+    // * 이벤트 추가
+    final ref2 = referenceDatase
+        .reference()
+        .child('Channels')
+        .onChildAdded
+        .listen((event) {
+      setState(() {
+        print(event.snapshot.value);
+      });
+    });
   }
 
   Future<void> _initAgoraRtcEngine() async {
@@ -74,24 +109,16 @@ class _CallPageState extends State<CallPage> {
           _infoStrings.add(info);
         });
       },
-      leaveChannel: (stats) {
-        setState(() {
-          _infoStrings.add('onLeaveChannel');
-          _users.clear();
-        });
-      },
       userJoined: (uid, elapsed) {
         setState(() {
           final info = 'userJoined: $uid';
           _infoStrings.add(info);
-          _users.add(uid);
         });
       },
       userOffline: (uid, elapsed) {
         setState(() {
           final info = 'userOffline: $uid';
           _infoStrings.add(info);
-          _users.remove(uid);
         });
       },
       audioVolumeIndication: (speakers, totalVolume) {
@@ -102,6 +129,8 @@ class _CallPageState extends State<CallPage> {
       },
     ));
   }
+
+  void _databaseUpdate() {}
 
   /// Info panel to show logs
   Widget _panel() {
@@ -157,20 +186,38 @@ class _CallPageState extends State<CallPage> {
     return Text('volume: $_totalVolume ');
   }
 
+  Widget _users() {
+    final ref = referenceDatase
+        .reference()
+        .child('Channels')
+        .onChildAdded
+        .listen((event) {
+      print(event.snapshot.value);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Connect'),
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: Icon(Icons.call_end),
+        ),
+        title: Text('Chennel: ${widget.channel}'),
       ),
-      body: Center(
-        child: Stack(
-          children: <Widget>[
-            // _viewRows(),
-            _panel(),
-            // _toolbar(),
-            _volumePanel(),
-          ],
+      body: SafeArea(
+        child: Center(
+          child: Stack(
+            children: <Widget>[
+              // _viewRows(),
+              _panel(),
+              // _toolbar(),
+              _volumePanel(),
+            ],
+          ),
         ),
       ),
     );
