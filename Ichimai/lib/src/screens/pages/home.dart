@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:ichimai/src/models/channel.dart';
 import 'package:ichimai/src/models/user.dart';
 import 'package:ichimai/src/services/connect.dart';
@@ -22,7 +23,11 @@ class _HomeState extends State<Home> {
         body: ChannelList(),
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.create),
-          onPressed: () {},
+          onPressed: () async {
+            Position position = await Geolocator.getCurrentPosition(
+                desiredAccuracy: LocationAccuracy.high);
+            print(position.toString());
+          },
         ),
       ),
     );
@@ -46,12 +51,6 @@ class _ChannelListState extends State<ChannelList> {
     setState(() {
       list.add(newChannel);
     });
-  }
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
   }
 
   @override
