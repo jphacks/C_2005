@@ -6,7 +6,7 @@ import 'package:ichimai/src/shared/theme.dart';
 class Register extends StatefulWidget {
   final Function toggleView;
 
-  const Register({key, this.toggleView}) : super(key: key);
+  const Register({Key key, this.toggleView}) : super(key: key);
 
   @override
   _RegisterState createState() => _RegisterState();
@@ -50,11 +50,7 @@ class _RegisterState extends State<Register> {
                   SizedBox(height: 20.0),
                   TextFormField(
                     decoration: textInputDecoration.copyWith(hintText: 'Email'),
-                    validator: (val) {
-                      if (val != null) {
-                        return val.isEmpty ? 'Enter an email' : null;
-                      }
-                    },
+                    validator: (val) => val.isEmpty ? 'Enter an email' : null,
                     onChanged: (val) {
                       setState(() => email = val);
                     },
@@ -65,13 +61,9 @@ class _RegisterState extends State<Register> {
                       decoration:
                           textInputDecoration.copyWith(hintText: 'Password'),
                       obscureText: true,
-                      validator: (val) {
-                        if (val != null) {
-                          return val.length < 6
-                              ? 'Enter a password 6+ chars long'
-                              : null;
-                        }
-                      },
+                      validator: (val) => val.length < 6
+                          ? 'Enter a password 6+ chars long'
+                          : null,
                       onChanged: (val) {
                         setState(() => password = val);
                       }),

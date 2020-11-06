@@ -1,22 +1,33 @@
-import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:ichimai/src/shared/settings.dart';
+import 'dart:async';
 
-class Call extends StatefulWidget {
+import 'package:agora_rtc_engine/rtc_engine.dart';
+import 'package:ichimai/src/shared/settings.dart';
+import 'package:permission_handler/permission_handler.dart';
+
+//* 토큰, 채널을 인수로 입력받음
+//* 연결동작과 통화중 페이지를 표시
+//*
+
+class CallPage extends StatefulWidget {
   final String token, channel;
   final int uid;
 
-  const Call({Key key, this.token, this.channel, this.uid}) : super(key: key);
+  const CallPage({Key key, this.token, this.channel, this.uid})
+      : super(key: key);
 
   @override
-  _CallState createState() => _CallState();
+  _CallPageState createState() => _CallPageState();
 }
 
-class _CallState extends State<Call> {
+class _CallPageState extends State<CallPage> {
   final referenceDatase = FirebaseDatabase.instance;
+
   final _infoStrings = <String>[];
+  bool muted = false;
   RtcEngine _engine;
+  int _totalVolume = 0;
 
   @override
   void initState() {
@@ -43,6 +54,20 @@ class _CallState extends State<Call> {
   }
 
   Future<void> initialize() async {
+    await PermissionHandler().requestPermissions(
+      [PermissionGroup.microphone],
+    );
+
+    if (APP_ID.isEmpty) {
+      setState(() {
+        _infoStrings.add(
+          'APP_ID missing, please provide your APP_ID in settings.dart',
+        );
+        _infoStrings.add('Agora Engine is not starting');
+      });
+      return;
+    }
+
     await _initAgoraRtcEngine();
 
     _addAgoraEventHandlers();
@@ -53,6 +78,21 @@ class _CallState extends State<Call> {
         referenceDatase.reference().child('Channels').child(widget.channel);
     ref.child('token').set(widget.token).asStream();
     ref.child('starting at').set(DateTime.now().millisecondsSinceEpoch);
+    // * 이벤트 추가
+    final ref2 = referenceDatase
+        .reference()
+        .child('Channels')
+        .onChildAdded
+        .listen((event) {
+      setState(() {
+        print(event.snapshot.value);
+      });
+    });
+  }
+
+  Future<void> _initAgoraRtcEngine() async {
+    // Create RTC client instance
+    _engine = await RtcEngine.create(APP_ID);
   }
 
   void _addAgoraEventHandlers() {
@@ -90,13 +130,96 @@ class _CallState extends State<Call> {
     ));
   }
 
-  Future<void> _initAgoraRtcEngine() async {
-    // Create RTC client instance
-    _engine = await RtcEngine.create(APP_ID);
+  void _databaseUpdate() {}
+
+  /// Info panel to show logs
+  Widget _panel() {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 48),
+      alignment: Alignment.bottomCenter,
+      child: FractionallySizedBox(
+        heightFactor: 0.5,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 48),
+          child: ListView.builder(
+            reverse: true,
+            itemCount: _infoStrings.length,
+            itemBuilder: (BuildContext context, int index) {
+              if (_infoStrings.isEmpty) {
+                return null;
+              }
+              return Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 3,
+                  horizontal: 10,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Flexible(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 2,
+                          horizontal: 5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.yellowAccent,
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        child: Text(
+                          _infoStrings[index],
+                          style: TextStyle(color: Colors.blueGrey),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _volumePanel() {
+    return Text('volume: $_totalVolume ');
+  }
+
+  Widget _users() {
+    final ref = referenceDatase
+        .reference()
+        .child('Channels')
+        .onChildAdded
+        .listen((event) {
+      print(event.snapshot.value);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: Icon(Icons.call_end),
+        ),
+        title: Text('Chennel: ${widget.channel}'),
+      ),
+      body: SafeArea(
+        child: Center(
+          child: Stack(
+            children: <Widget>[
+              // _viewRows(),
+              _panel(),
+              // _toolbar(),
+              _volumePanel(),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

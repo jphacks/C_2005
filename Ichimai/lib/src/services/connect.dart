@@ -1,8 +1,6 @@
 import 'dart:async';
 
-import 'package:firebase_database/firebase_database.dart';
 import 'package:http/http.dart' as http;
-import 'package:ichimai/src/models/channel.dart';
 import 'package:ichimai/src/models/user.dart';
 
 class ConnectionService {
@@ -15,9 +13,5 @@ class ConnectionService {
     } else {
       throw Exception('Failed to load post');
     }
-  }
-
-  Channel getChannelsFromDatasnapshot(DataSnapshot snapshot) {
-    return Channel(name: snapshot.key, token: snapshot.value.toString());
   }
 }
