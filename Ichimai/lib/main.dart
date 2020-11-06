@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
         // Check for errors
         if (snapshot.hasError) {
           print('Fail to connect firebase');
-          return null;
+          return Container();
         }
 
         // Once complete, show your application
