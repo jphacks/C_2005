@@ -4,7 +4,6 @@ import 'dart:async';
 
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:ichimai/src/shared/settings.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 //* 토큰, 채널을 인수로 입력받음
 //* 연결동작과 통화중 페이지를 표시
@@ -16,6 +15,9 @@ class CallPage extends StatefulWidget {
 
   const CallPage({Key key, this.token, this.channel, this.uid})
       : super(key: key);
+
+  // const CallPage({Key key, this.token, this.channel, this.uid})
+  //     : super(key: key);
 
   @override
   _CallPageState createState() => _CallPageState();
@@ -54,9 +56,9 @@ class _CallPageState extends State<CallPage> {
   }
 
   Future<void> initialize() async {
-    await PermissionHandler().requestPermissions(
-      [PermissionGroup.microphone],
-    );
+    // await PermissionHandler().requestPermissions(
+    //   [PermissionGroup.microphone],
+    // );
 
     if (APP_ID.isEmpty) {
       setState(() {
