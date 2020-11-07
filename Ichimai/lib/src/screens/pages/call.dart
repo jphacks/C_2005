@@ -98,9 +98,11 @@ class _CallState extends State<Call> {
       },
       audioVolumeIndication: (speakers, totalVolume) {
         //! 볼륨과 사용자 감지
+        /*
         setState(() {
           _totalVolume = totalVolume;
         });
+         */
       },
     ));
   }

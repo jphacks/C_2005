@@ -7,6 +7,7 @@ import 'package:ichimai/src/screens/pages/call.dart';
 import 'package:ichimai/src/services/connect.dart';
 import 'package:ichimai/src/shared/loading.dart';
 import 'package:provider/provider.dart';
+import 'package:ichimai/src/services/auth.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -14,6 +15,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  final AuthService _auth = AuthService();
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<UserData>(context);
@@ -22,6 +24,7 @@ class _HomeState extends State<Home> {
         body: ChannelList(),
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.create),
+          /*
           onPressed: () async {
             ConnectionService()
                 .getToken(
@@ -37,6 +40,11 @@ class _HomeState extends State<Home> {
                 );
               }));
             });
+          },
+
+           */
+          onPressed: () {
+            _auth.signOut();
           },
         ),
       ),
