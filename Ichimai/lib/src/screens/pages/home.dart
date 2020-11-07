@@ -1,11 +1,9 @@
-import 'dart:collection';
-import 'dart:convert';
-
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:ichimai/src/models/channel.dart';
 import 'package:ichimai/src/models/user.dart';
+import 'package:ichimai/src/screens/pages/call.dart';
 import 'package:ichimai/src/services/connect.dart';
 import 'package:ichimai/src/shared/loading.dart';
 import 'package:provider/provider.dart';
@@ -20,6 +18,7 @@ class _HomeState extends State<Home> {
   final AuthService _auth = AuthService();
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserData>(context);
     return SafeArea(
       child: Scaffold(
         body: ChannelList(),
@@ -27,9 +26,20 @@ class _HomeState extends State<Home> {
           child: Icon(Icons.create),
           /*
           onPressed: () async {
-            Position position = await Geolocator.getCurrentPosition(
-                desiredAccuracy: LocationAccuracy.high);
-            print(position.toString());
+            ConnectionService()
+                .getToken(
+                    user, user.name.replaceAll('@', '').replaceAll('.', ''))
+                .then((value) {
+              print(value);
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (BuildContext context) {
+                return Call(
+                  token: value,
+                  channel: user.name.replaceAll('@', '').replaceAll('.', ''),
+                  uid: user.generateAgoraUid(),
+                );
+              }));
+            });
           },
 
            */
@@ -51,6 +61,7 @@ class ChannelList extends StatefulWidget {
 class _ChannelListState extends State<ChannelList> {
   DatabaseReference mDatabase = FirebaseDatabase().reference();
   List<Channel> list = [];
+  Position position;
 
   void updateList(DataSnapshot snapshot) {
     Channel newChannel =
@@ -61,18 +72,21 @@ class _ChannelListState extends State<ChannelList> {
     });
   }
 
+  void initiate() async {
+    position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    initiate();
+  }
+
   @override
   Widget build(BuildContext context) {
-    FirebaseDatabase.instance
-        .reference()
-        .child('Channels')
-        .onChildChanged
-        .listen((event) {
-      setState(() {
-        print('list updated');
-      });
-      // updateList(event.snapshot);
-    });
+    final user = Provider.of<UserData>(context);
     return FutureBuilder(
       future: FirebaseDatabase.instance.reference().child('Channels').once(),
       builder: (BuildContext context, AsyncSnapshot<DataSnapshot> snapshot) {
@@ -87,14 +101,47 @@ class _ChannelListState extends State<ChannelList> {
           data.forEach((key, value) {
             Map<String, dynamic> smallData = Map.from(value);
 
-            list.add(Channel(name: key, token: smallData['token']));
+            list.add(Channel(
+                name: key,
+                token: smallData['token'],
+                latitude: smallData['la'],
+                longitude: smallData['lo']));
           });
+
+          list.sort((a, b) => Geolocator.distanceBetween(a.latitude,
+                  a.longitude, position.latitude, position.longitude)
+              .compareTo(Geolocator.distanceBetween(b.latitude, b.longitude,
+                  position.latitude, position.longitude)));
           return ListView.builder(
             itemCount: list.length,
             itemBuilder: (BuildContext context, int index) {
               return ListTile(
                 title: Text(list[index].name),
-                subtitle: Text(list[index].token),
+                subtitle: Text(Geolocator.distanceBetween(
+                        list[index].latitude,
+                        list[index].longitude,
+                        position.latitude,
+                        position.longitude)
+                    .toString()),
+                onTap: () {
+                  ConnectionService()
+                      .getToken(user,
+                          user.name.replaceAll('@', '').replaceAll('.', ''))
+                      .then((value) {
+                    print(value);
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (BuildContext context) {
+                      return Call(
+                        token: list[index].token,
+                        channel: list[index]
+                            .name
+                            .replaceAll('@', '')
+                            .replaceAll('.', ''),
+                        uid: user.generateAgoraUid(),
+                      );
+                    }));
+                  });
+                },
               );
             },
           );

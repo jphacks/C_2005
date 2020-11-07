@@ -1,13 +1,10 @@
 class Channel {
   String name;
   DateTime startDate;
-  double latitude;
-  double longitude;
+  final double latitude;
+  final double longitude;
   final String token;
 
-  Channel({this.name, this.startDate, this.token});
-
-  Channel.fromJson(Map<String, dynamic> json)
-      : name = json['name'],
-        token = json['email'];
+  Channel(
+      {this.latitude, this.longitude, this.name, this.startDate, this.token});
 }
