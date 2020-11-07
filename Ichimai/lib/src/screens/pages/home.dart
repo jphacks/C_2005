@@ -1,7 +1,3 @@
-import 'dart:async';
-import 'dart:collection';
-import 'dart:convert';
-
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -82,6 +78,7 @@ class _ChannelListState extends State<ChannelList> {
 
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserData>(context);
     return FutureBuilder(
       future: FirebaseDatabase.instance.reference().child('Channels').once(),
       builder: (BuildContext context, AsyncSnapshot<DataSnapshot> snapshot) {
@@ -118,6 +115,25 @@ class _ChannelListState extends State<ChannelList> {
                         position.latitude,
                         position.longitude)
                     .toString()),
+                onTap: () {
+                  ConnectionService()
+                      .getToken(user,
+                          user.name.replaceAll('@', '').replaceAll('.', ''))
+                      .then((value) {
+                    print(value);
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (BuildContext context) {
+                      return Call(
+                        token: list[index].token,
+                        channel: list[index]
+                            .name
+                            .replaceAll('@', '')
+                            .replaceAll('.', ''),
+                        uid: user.generateAgoraUid(),
+                      );
+                    }));
+                  });
+                },
               );
             },
           );
