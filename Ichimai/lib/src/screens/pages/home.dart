@@ -122,10 +122,11 @@ class _ChannelListState extends State<ChannelList> {
             Map<String, dynamic> smallData = Map.from(value);
 
             list.add(Channel(
-                name: key,
-                token: smallData['token'],
-                latitude: smallData['la'],
-                longitude: smallData['lo']));
+              name: key,
+              token: smallData['token'],
+              latitude: smallData['la'],
+              longitude: smallData['lo'],
+            ));
           });
 
           list.sort((a, b) => Geolocator.distanceBetween(a.latitude,
@@ -135,33 +136,37 @@ class _ChannelListState extends State<ChannelList> {
           return ListView.builder(
             itemCount: list.length,
             itemBuilder: (BuildContext context, int index) {
-              return ListTile(
-                title: Text(list[index].name),
-                subtitle: Text(Geolocator.distanceBetween(
-                        list[index].latitude,
-                        list[index].longitude,
-                        position.latitude,
-                        position.longitude)
-                    .toString()),
-                onTap: () {
-                  ConnectionService()
-                      .getToken(user,
-                          user.name.replaceAll('@', '').replaceAll('.', ''))
-                      .then((value) {
-                    print(value);
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (BuildContext context) {
-                      return Call(
-                        token: list[index].token,
-                        channel: list[index]
-                            .name
-                            .replaceAll('@', '')
-                            .replaceAll('.', ''),
-                        uid: user.generateAgoraUid(),
-                      );
-                    }));
-                  });
-                },
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ListTile(
+                  title: Text(list[index].name),
+                  subtitle: Text(''),
+                  // subtitle: Text(Geolocator.distanceBetween(
+                  //         list[index].latitude,
+                  //         list[index].longitude,
+                  //         position.latitude,
+                  //         position.longitude)
+                  // .toString()),
+                  onTap: () {
+                    ConnectionService()
+                        .getToken(user,
+                            user.name.replaceAll('@', '').replaceAll('.', ''))
+                        .then((value) {
+                      print(value);
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (BuildContext context) {
+                        return Call(
+                          token: list[index].token,
+                          channel: list[index]
+                              .name
+                              .replaceAll('@', '')
+                              .replaceAll('.', ''),
+                          uid: user.generateAgoraUid(),
+                        );
+                      }));
+                    });
+                  },
+                ),
               );
             },
           );
