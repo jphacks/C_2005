@@ -6,7 +6,7 @@ import 'package:ichimai/src/shared/theme.dart';
 class SignIn extends StatefulWidget {
   final Function toggleView; //Register/SignIn 교환 토글
 
-  const SignIn({Key key, this.toggleView}) : super(key: key);
+  const SignIn({this.toggleView});
 
   @override
   _SignInState createState() => _SignInState();
@@ -51,7 +51,11 @@ class _SignInState extends State<SignIn> {
                   SizedBox(height: 20.0),
                   TextFormField(
                     decoration: textInputDecoration.copyWith(hintText: 'Email'),
-                    validator: (val) => val.isEmpty ? 'Enter an email' : null,
+                    validator: (val) {
+                      if (val != null) {
+                        return val.isEmpty ? 'Enter an email' : null;
+                      }
+                    },
                     onChanged: (val) {
                       setState(() => email = val);
                     },
@@ -62,9 +66,11 @@ class _SignInState extends State<SignIn> {
                       decoration:
                           textInputDecoration.copyWith(hintText: 'Password'),
                       obscureText: true,
-                      validator: (val) => val.length < 6
-                          ? 'Enter a password 6+ chars long'
-                          : null,
+                      validator: (val) {
+                        return val.length < 6
+                            ? 'Enter a password 6+ chars long'
+                            : null;
+                      },
                       onChanged: (val) {
                         setState(() => password = val);
                       }),
@@ -77,7 +83,8 @@ class _SignInState extends State<SignIn> {
                         style: TextStyle(color: Colors.white),
                       ),
                       onPressed: () async {
-                        if (_formKey.currentState.validate()) {
+                        if (_formKey.currentState != null &&
+                            _formKey.currentState.validate()) {
                           print('signin');
                           setState(() => loading = true);
                           dynamic result = await _auth

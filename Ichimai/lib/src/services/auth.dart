@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ichimai/src/models/user.dart';
 
@@ -7,7 +9,7 @@ class AuthService {
   // create user obj based on firebaseUser
   UserData _userFromFirebaseUser(User user) {
     if (user != null) {
-      return UserData(uid: user.uid);
+      return UserData(uid: user.uid, name: user.email);
     } else {
       return null;
     }
