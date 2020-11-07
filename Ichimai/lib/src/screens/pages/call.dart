@@ -29,6 +29,7 @@ class _CallState extends State<Call> {
   RtcEngine _engine;
   final _infoStrings = <String>[];
   int _totalVolume = 0;
+  List<String> _users = [];
 
   @override
   void dispose() {
@@ -64,6 +65,7 @@ class _CallState extends State<Call> {
     ref.child('token').set(widget.token).asStream();
     ref.child('starting at').set(DateTime.now().millisecondsSinceEpoch);
     // *
+    _users.add(widget.uid.toString());
   }
 
   void _addAgoraEventHandlers() {
@@ -84,12 +86,14 @@ class _CallState extends State<Call> {
         setState(() {
           final info = 'userJoined: $uid';
           _infoStrings.add(info);
+          _users.add(uid.toString());
         });
       },
       userOffline: (uid, elapsed) {
         setState(() {
           final info = 'userOffline: $uid';
           _infoStrings.add(info);
+          _users.remove(uid.toString());
         });
       },
       audioVolumeIndication: (speakers, totalVolume) {
@@ -159,6 +163,22 @@ class _CallState extends State<Call> {
     return Text('volume: $_totalVolume ');
   }
 
+  Widget _userList() {
+    List<Widget> userWidgets = [];
+    _users.forEach((element) {
+      userWidgets.add(Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text('$element ,'),
+      ));
+    });
+    return Column(children: [
+      Text('Online Players'),
+      Row(
+        children: userWidgets,
+      )
+    ]);
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<UserData>(context);
@@ -167,17 +187,12 @@ class _CallState extends State<Call> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: Icon(Icons.call_end),
-          ),
           title: Text('Chennel: ${widget.channel}'),
         ),
         body: Center(
           child: Stack(
             children: <Widget>[
+              _userList(),
               // _viewRows(),
               _panel(),
               // ChatStream(channel: widget.channel)
