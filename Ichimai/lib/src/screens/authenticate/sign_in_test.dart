@@ -113,13 +113,13 @@ class _ChatterLoginState extends State<ChatterLogin> {
                           print(result);
                           if (result == null) {
                             setState(() {
+                              loggingin = false;
                               EdgeAlert.show(context,
                                   title: 'Login Failed',
                                   description: 'Check it out again',
                                   gravity: EdgeAlert.BOTTOM,
                                   icon: Icons.error,
                                   backgroundColor: Colors.deepPurple[900]);
-                              loggingin = false;
                             });
                           }
                         }
