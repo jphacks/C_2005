@@ -21,6 +21,9 @@ class _HomeState extends State<Home> {
     final user = Provider.of<UserData>(context);
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(
+          title: Text('Home'),
+        ),
         body: ChannelList(),
         floatingActionButton: FloatingActionButton(
           child: Icon(Icons.create),
@@ -44,7 +47,20 @@ class _HomeState extends State<Home> {
 
            */
           onPressed: () {
-            _auth.signOut();
+            ConnectionService()
+                .getToken(
+                    user, user.name.replaceAll('@', '').replaceAll('.', ''))
+                .then((value) {
+              print(value);
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (BuildContext context) {
+                return Call(
+                  token: value,
+                  channel: user.name.replaceAll('@', '').replaceAll('.', ''),
+                  uid: user.generateAgoraUid(),
+                );
+              }));
+            });
           },
         ),
       ),
@@ -97,7 +113,11 @@ class _ChannelListState extends State<ChannelList> {
           }
           // updateList(snapshot.data);
           list = [];
+          if (snapshot.data.value == null) {
+            return Loading();
+          }
           Map<String, dynamic> data = Map.from(snapshot.data.value);
+
           data.forEach((key, value) {
             Map<String, dynamic> smallData = Map.from(value);
 
