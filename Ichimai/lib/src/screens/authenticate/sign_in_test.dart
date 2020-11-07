@@ -1,9 +1,12 @@
-import 'package:chat_app/widgets/custombutton.dart';
-import 'package:chat_app/widgets/customtextinput.dart';
+import 'package:ichimai/widgets/custombutton.dart';
+import 'package:ichimai/widgets/customtextinput.dart';
 import 'package:edge_alert/edge_alert.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:ichimai/src/services/auth.dart';
+import 'package:ichimai/src/shared/loading.dart';
+import 'package:ichimai/src/shared/theme.dart';
 
 class ChatterLogin extends StatefulWidget {
   @override
@@ -14,7 +17,16 @@ class _ChatterLoginState extends State<ChatterLogin> {
   String email;
   String password;
   bool loggingin = false;
-  final _auth = FirebaseAuth.instance;
+  //final _auth = FirebaseAuth.instance;
+  final AuthService _auth = AuthService();
+  /*
+  @override
+  void initState() {
+    _auth.signOut();
+    super.initState();
+  }
+
+   */
   @override
   Widget build(BuildContext context) {
     return ModalProgressHUD(
@@ -44,7 +56,7 @@ class _ChatterLoginState extends State<ChatterLogin> {
                   Hero(
                     tag: 'HeroTitle',
                     child: Text(
-                      'Chatter',
+                      'ICHIMAI',
                       style: TextStyle(
                           color: Colors.deepPurple[900],
                           fontFamily: 'Poppins',
@@ -92,24 +104,53 @@ class _ChatterLoginState extends State<ChatterLogin> {
                       accentColor: Colors.white,
                       mainColor: Colors.deepPurple,
                       onpress: () async {
+
+                        if (password != null && email!=null) {
+                          print('signin');
+                          setState(() => loggingin = true);
+                          dynamic result = await _auth
+                              .signInWithEmailAndPassword(email, password);
+                          print(result);
+                          if (result == null) {
+                            setState(() {
+                              EdgeAlert.show(context,
+                                  title: 'Login Failed',
+                                  description: 'Check it out again',
+                                  gravity: EdgeAlert.BOTTOM,
+                                  icon: Icons.error,
+                                  backgroundColor: Colors.deepPurple[900]);
+                              loggingin = false;
+                            });
+                          }
+                        }
+                        /*
+
                         if (password != null && email != null) {
                           setState(() {
                             loggingin = true;
                           });
                           try {
                             final loggedUser =
-                                await _auth.signInWithEmailAndPassword(
-                                    email: email, password: password);
+                            await _auth.signInWithEmailAndPassword(
+                                email, password);
                             if (loggedUser != null) {
                               setState(() {
                                 loggingin = false;
                               });
-                              Navigator.pushNamed(context, '/chat');
+                              print(loggedUser);
+                             // Navigator.pushNamed(context, '/chat');
+                            }else {
+                              EdgeAlert.show(context,
+                                  title: 'Login Failed',
+                                  description: 'Check it out again',
+                                  gravity: EdgeAlert.BOTTOM,
+                                  icon: Icons.error,
+                                  backgroundColor: Colors.deepPurple[900]);
                             }
                           } catch (e) {
                             setState(() {
-                                loggingin = false;
-                              });
+                              loggingin = false;
+                            });
                             EdgeAlert.show(context,
                                 title: 'Login Failed',
                                 description: e.toString(),
@@ -121,12 +162,13 @@ class _ChatterLoginState extends State<ChatterLogin> {
                           EdgeAlert.show(context,
                               title: 'Uh oh!',
                               description:
-                                  'Please enter the email and password.',
+                              'Please enter the email and password.',
                               gravity: EdgeAlert.BOTTOM,
                               icon: Icons.error,
                               backgroundColor: Colors.deepPurple[900]);
                         }
                         // Navigator.pushReplacementNamed(context, '/chat');
+                        */
                       },
                     ),
                   ),
@@ -150,7 +192,7 @@ class _ChatterLoginState extends State<ChatterLogin> {
                   Hero(
                     tag: 'footer',
                     child: Text(
-                      'Made with ♥ by ishandeveloper',
+                      'JPHACKS 2020 C_2005',
                       style: TextStyle(fontFamily: 'Poppins'),
                     ),
                   )

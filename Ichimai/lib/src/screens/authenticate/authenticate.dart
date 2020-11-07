@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ichimai/src/screens/authenticate/register.dart';
 import 'package:ichimai/src/screens/authenticate/sign_in.dart';
+import 'package:ichimai/src/screens/authenticate/sign_in_test.dart';
 
 class Authenticate extends StatefulWidget {
   @override
@@ -16,9 +17,12 @@ class _AuthenticateState extends State<Authenticate> {
   @override
   Widget build(BuildContext context) {
     if (showSignIn) {
+      return ChatterLogin();
+      /*
       return SignIn(
         toggleView: toggleView,
       );
+       */
     } else {
       return Register(toggleView: toggleView);
     }
