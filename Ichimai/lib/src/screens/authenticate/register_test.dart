@@ -45,7 +45,7 @@ class _ChatterSignUpState extends State<ChatterSignUp> {
                   Hero(
                     tag: 'HeroTitle',
                     child: Text(
-                      'Chatter',
+                      'ICHIMAI',
                       style: TextStyle(
                           color: Colors.deepPurple[900],
                           fontFamily: 'Poppins',
