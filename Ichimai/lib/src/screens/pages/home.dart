@@ -148,23 +148,18 @@ class _ChannelListState extends State<ChannelList> {
                   //         position.longitude)
                   // .toString()),
                   onTap: () {
-                    ConnectionService()
-                        .getToken(user,
-                            user.name.replaceAll('@', '').replaceAll('.', ''))
-                        .then((value) {
-                      print(value);
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (BuildContext context) {
-                        return Call(
-                          token: list[index].token,
-                          channel: list[index]
-                              .name
-                              .replaceAll('@', '')
-                              .replaceAll('.', ''),
-                          uid: user.generateAgoraUid(),
-                        );
-                      }));
-                    });
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (BuildContext context) {
+                      print(list[index].token);
+                      return Call(
+                        token: list[index].token,
+                        channel: list[index]
+                            .name
+                            .replaceAll('@', '')
+                            .replaceAll('.', ''),
+                        uid: user.generateAgoraUid(),
+                      );
+                    }));
                   },
                 ),
               );
